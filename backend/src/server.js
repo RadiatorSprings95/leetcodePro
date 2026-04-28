@@ -6,7 +6,7 @@ import { ENV } from "./lib/env.js";
 const app = express();
 const __dirname = path.resolve();
 
-app.get("/a",(req, res) =>{
+app.get("/healthz",(req, res) =>{
     res.status(200).json({msg: "sucess a"});
 });
 
