@@ -29,7 +29,7 @@ app.get("/b",(req, res) =>{
 if (ENV.NODE_ENV === "production") {
     app.use(express.static(frontendPath));
 
-    app.get("/(.*)", (req, res) => {
+    app.get("/:any*", (req, res) => {
         res.sendFile(path.join(frontendPath, "index.html"));
     });
 }
@@ -37,10 +37,11 @@ if (ENV.NODE_ENV === "production") {
 const startServer = async() => {
     try {
     await connectDB();
-    app.listen(ENV.PORT, () => console.log(`server running at ${ENV.PORT}`));
+    const port = ENV.PORT || 10000;
+    app.listen(port, () => console.log(`server running at ${port}`));
     } catch (error) {
-        console.error("error starting the server: ", error)
+        console.error("error starting the server: ", error instanceof Error ? error.message : error)
     }
-}
+};
 
 startServer();
