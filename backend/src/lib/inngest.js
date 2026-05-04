@@ -5,8 +5,10 @@ import User from "../models/User.js"
 export const inngest = new Inngest({ id: "leetcode-pro" });
 
 const syncUser = inngest.createFunction(
-    {id: "sync-user"},
-    {event: "clerk/user.created"},
+    { 
+        id: "sync-user",
+        event: "clerk/user.created"
+    },
     async ({event}) => {
         await connectDB()
 
@@ -17,14 +19,16 @@ const syncUser = inngest.createFunction(
             email: email_addresses[0]?.email_address,
             name: `${first_name || ""} ${last_name || ""}`,
             profileImage: image_url
-        }
+        };
 
-        await User.create(newUser)
+        await User.create(newUser);
     }
-)
+);
 const deleteUserFromDB = inngest.createFunction(
-    {id: "delete-user-from-db"},
-    {event: "clerk/user.deleted"},
+    {
+        id: "delete-user-from-db",
+        event: "clerk/user.deleted"
+    },
     async ({event}) => {
         await connectDB()
 
@@ -33,7 +37,7 @@ const deleteUserFromDB = inngest.createFunction(
 
         await User.deleteOne({ clerkId: id});
     }
-)
+);
 
 
 export const functions = [syncUser, deleteUserFromDB]
