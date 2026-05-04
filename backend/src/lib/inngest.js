@@ -7,10 +7,10 @@ export const inngest = new Inngest({ id: "leetcode-pro" });
 const syncUser = inngest.createFunction(
     { 
         id: "sync-user",
-        event: "clerk/user.created"
+        triggers: [{ event: "clerk/user.created" }]
     },
-    async ({event}) => {
-        await connectDB()
+    async ({event, step}) => {
+        await connectDB();
 
         const {id, email_addresses, first_name, last_name, image_url} = event.data
 
@@ -27,7 +27,7 @@ const syncUser = inngest.createFunction(
 const deleteUserFromDB = inngest.createFunction(
     {
         id: "delete-user-from-db",
-        event: "clerk/user.deleted"
+        triggers: [{ event: "clerk/user.deleted" }]
     },
     async ({event}) => {
         await connectDB()
