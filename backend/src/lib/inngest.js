@@ -2,7 +2,7 @@ import { Inngest } from "inngest"
 import { connectDB } from "./db.js"
 import User from "../models/User.js"
 
-export const inngest = new Inngest({ id: leetcode-pro});
+export const inngest = new Inngest({ id: "leetcode-pro" });
 
 const syncUser = inngest.createFunction(
     {id: "sync-user"},
@@ -31,7 +31,7 @@ const deleteUserFromDB = inngest.createFunction(
         const {id} = event.data
 
 
-        await User.deleteOne({ clearkId: id});
+        await User.deleteOne({ clerkId: id});
     }
 )
 
