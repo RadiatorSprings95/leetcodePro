@@ -33,13 +33,15 @@ const syncUser = inngest.createFunction(
         });
 
         await step.run("sync-to-stream", async() => {
-            await upsertStreamUser({
+
+            const streamUserData = {
                 id: newUser.clerkId.toString(),
                 name: newUser.name,
                 image: newUser.profileImage
-            });
+            };
+            await upsertStreamUser(streamUserData);
+            return streamUserData;
         });
-
     }
 );
 
