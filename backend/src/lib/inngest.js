@@ -24,7 +24,11 @@ const syncUser = inngest.createFunction(
             await User.updateOne(
                 { clerkId: id },
                 { $set: newUser },
-                { upsert: true }
+                { 
+                    upsert: true,
+                    runValidators: true,
+                    setDefaultsOnInsert: true
+                 }
             );
         });
 
