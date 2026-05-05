@@ -11,20 +11,15 @@ if(!apiKey || !apiSecret){
 export const chatClient = StreamChat.getInstance(apiKey, apiSecret);
 
 export const upsertStreamUser = async(userData) => {
-    try {
         await chatClient.upsertUser(userData)
         console.log("stream user upserted successfully:", userData);
-    } catch (error) {
-        console.error("Error upserting stream user: ",error);
-    }
 }
 
 export const deleteStreamUser = async(userId) => {
-    try {
-        await chatClient.deleteUser(userId)
+        await chatClient.deleteUsers([userId], {
+            user: 'hard',
+            messages: 'hard'
+        });
         console.log("stream user deleted successfully:", userId);
-    } catch (error) {
-        console.error("Error deleting stream user: ",error);
-    }
 }
 // method to generate tokens

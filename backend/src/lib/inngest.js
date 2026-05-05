@@ -11,40 +11,51 @@ const syncUser = inngest.createFunction(
         triggers: { event: "clerk/user.created" }
     },
     async ({event, step}) => {
-        await connectDB();
-
         const {id, email_addresses, first_name, last_name, image_url} = event.data
-
+        
         const newUser = {
             clerkId: id,
             email: email_addresses[0]?.email_address,
             name: `${first_name || ""} ${last_name || ""}`,
             profileImage: image_url
         };
-
-        await User.create(newUser);
-
-        await upsertStreamUser({
-            id: newUser.clerkId.toString(),
-            name: newUser.name,
-            image: newUser.profileImage
+        await step.run("sync-to-mongodb", async() => {
+            await connectDB();
+            await User.updateOne(
+                { clerkId: id },
+                { $set: newUser },
+                { upsert: true }
+            );
         });
+
+        await step.run("sync-to-stream", async() => {
+            await upsertStreamUser({
+                id: newUser.clerkId.toString(),
+                name: newUser.name,
+                image: newUser.profileImage
+            });
+        });
+
     }
 );
+
 const deleteUserFromDB = inngest.createFunction(
     {
         id: "delete-user-from-db",
         triggers: { event: "clerk/user.deleted" }
     },
-    async ({event}) => {
-        await connectDB()
+    async ({event, step}) => {
+        const {id} = event.data;
+        await step.run("delete-from-mongodb", async () => {
+            await connectDB();
+            await User.deleteOne({ clerkId: id});
+        });
 
-        const {id} = event.data
-
-        await User.deleteOne({ clerkId: id});
-        await deleteStreamUser(id.toString());
+        await step.run("delete-from-stream", async () => {
+            await deleteStreamUser(id.toString());
+        });
     }
 );
 
 
-export const functions = [syncUser, deleteUserFromDB]
+export const functions = [syncUser, deleteUserFromDB];
