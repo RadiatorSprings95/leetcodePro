@@ -1,6 +1,5 @@
 import { requireAuth } from '@clerk/express'
 import User from '../models/User.js'
-import { use } from 'react';
 
 export const protectRoute = [
     requireAuth(),
