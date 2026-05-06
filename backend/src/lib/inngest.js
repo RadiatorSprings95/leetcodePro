@@ -43,6 +43,7 @@ const syncUser = inngest.createFunction(
             return streamUserData;
         });
     }
+    // Challenge - add a welcome email
 );
 
 const deleteUserFromDB = inngest.createFunction(
