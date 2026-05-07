@@ -1,6 +1,6 @@
 import { chatClient, streamClient } from "../lib/stream.js";
 import  Session  from "../models/Session.js";
-
+import mongoose from "mongoose";
 
 export async function createSession(req, res) {
     try {
@@ -13,22 +13,28 @@ export async function createSession(req, res) {
         }
         const callId = `session_${Date.now()}_${Math.random().toString(36).substring(7)}`;
         const session = await Session.create({ problem, difficulty, host: userId, callId});
-        
-        // video calls
-        await streamClient.video.call("default", callId).getOrCreate({
-            data: {
+        try {
+            await streamClient.video.call("default", callId).getOrCreate({
+                data: {
+                    created_by_id: clerkId,
+                    custom: {problem, difficulty, sessionId: session._id.toString()}
+                }
+            });
+    
+            // chat messaging
+            const channel = chatClient.channel("messaging", callId, {
+                name: `${problem} Session`,
                 created_by_id: clerkId,
-                custom: {problem, difficulty, sessionId: session._id.toString()}
-            }
-        });
-
-        // chat messaging
-        const channel = chatClient.channel("messaging", callId, {
-            name: `${problem} Session`,
-            created_by_id: clerkId,
-            members: [clerkId]
-        })
-        await channel.create()
+                members: [clerkId]
+            })
+            await channel.create();
+            
+        } catch (provisionErr) {
+            await Session.findByIdAndDelete(session._id);
+            throw provisionErr;
+            
+        }
+        // video calls
 
         res.status(201).json({ session })
     } catch (error) {
@@ -74,6 +80,9 @@ export async function getMyRecentSessions(req, res) {
 export async function getSessionById(req, res) {
     try {
         const { id } = req.params;
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({ msg: "Invalid session id" });
+        }
         const session = await Session.findById(id)
             .populate("host", "name email profileImage clerkId")
             .populate("participant", "name email profileImage clerkId");
@@ -90,7 +99,9 @@ export async function getSessionById(req, res) {
 export async function joinSession(req, res) {
     try {
         const { id } = req.params;
-        const userId = req.user._id;
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({ msg: "Invalid session id" });
+        }        const userId = req.user._id;
         const clerkId = req.user.clerkId;
 
         const session = await Session.findById(id);
@@ -115,7 +126,9 @@ export async function joinSession(req, res) {
 export async function endSession(req, res) {
     try {
         const { id } = req.params;
-        const userId = req.user._id;
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({ msg: "Invalid session id" });
+        }        const userId = req.user._id;
 
         const session = await Session.findById(id);
         if (!session) return res.status(404).json({ msg: "Session not found" });
@@ -133,13 +146,18 @@ export async function endSession(req, res) {
         session.status = "completed";
         await session.save()
         
-        // delete stream video call
-        const call = streamClient.video.call("default", session.callId);
-        await call.delete({ hard: true});
-
-        // delete stream chat channel
-        const channel = chatClient.channel("messaging", session.callId);
-        await channel.delete();
+        try {
+            // delete stream video call
+            const call = streamClient.video.call("default", session.callId);
+            await call.delete({ hard: true});
+    
+            // delete stream chat channel
+            const channel = chatClient.channel("messaging", session.callId);
+            await channel.delete();
+            
+        } catch (cleanupError) {
+            console.error("Session completed but cleanup failed:", cleanupError);
+        }
 
         res.status(200).json({ session, msg: "Session ended successfully"});
             
