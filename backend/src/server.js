@@ -18,7 +18,7 @@ const frontendPath = path.resolve(__dirname, "../../frontend/dist");
 const app = express();
 // const __dirname = path.resolve();
 
-// Middleware
+// Middleware 
 app.use(express.json())
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true}))
 app.use(clerkMiddleware()); // this adds the auth field to requests
