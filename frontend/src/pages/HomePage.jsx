@@ -25,7 +25,7 @@ function HomePage() {
                     <button className="group px-6 py-3 rounded-xl  text-success font-semibold text-sm  hover:shadow-xl hover:bg-amber-50
                     transition-all duration-200 hover:scale-105 flex items-center gap-2 ">
                         <span>Get Started</span>
-                        <ArrowRightIcon className="size-4 group-hover:trnaslate-x-0.5 transition-transform"/>
+                        <ArrowRightIcon className="size-4 group-hover:translate-x-0.5 transition-transform"/>
                     </button>
                 </SignInButton>
 
