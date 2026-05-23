@@ -1,2 +1,1 @@
-Built a full-stack LeetCode-style platform with separate frontend and backend (JavaScript/Node.js), featuring 40+ commits of iterative development 
--- still in development phase.
+Built a full-stack LeetCode-style platform with a dedicated videocall feature with live chats. Basically leetcode but better --- still in development phase
