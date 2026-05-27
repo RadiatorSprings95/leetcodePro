@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar'
 
 import { PROBLEMS } from "../data/problems";
 import { ChevronRight, ChevronRightIcon, Code2Icon } from "lucide-react";
-import { getDifficultyBadgeClas } from "../lib/utils";
+import { getDifficultyBadgeClass } from "../lib/utils";
 
 function ProblemsPage() {
 const problems = Object.values(PROBLEMS);
@@ -43,7 +43,7 @@ const hardProblemCount = problems.filter(p => p.difficulty === "Hard").length;
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <h2 className="text-xl font-bold">{problem.title}</h2>
-                          <span className={`badge ${getDifficultyBadgeClas(problem.difficulty)}`}>
+                          <span className={`badge ${getDifficultyBadgeClass(problem.difficulty)}`}>
                             {problem.difficulty}
                           </span>
                         </div>
