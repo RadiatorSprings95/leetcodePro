@@ -30,8 +30,10 @@ function ProblemPage() {
       setCurrentProblemId(id);
       setCode(PROBLEMS[id].starterCode[selectedLanguage]);
       setOutput(null);
+    } else if (id){
+      navigate("/problems", {replace: true});
     }
-  }, [id, selectedLanguage]);
+  }, [id, selectedLanguage, navigate]);
 
   const handleLanguageChange = (e) => {
     const newLang = e.target.value

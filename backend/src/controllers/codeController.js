@@ -21,6 +21,12 @@ export const executeCode = async (req, res) => {
         error: `Unsupported language: ${language}` 
       });
     }
+    if (typeof code !== "string" || code.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Code is required",
+    });
+  }
 
     // Call the JDoodle API
     const response = await fetch(JDOODLE_API, {
