@@ -1,7 +1,7 @@
 export async function executeCode(language, code) {
   try {
     // Change the URL to point to your Express backend route
-    const response = await fetch("http://localhost:5001/api/code/execute", {
+    const response = await fetch("/api/code/execute", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

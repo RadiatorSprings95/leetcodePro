@@ -35,10 +35,6 @@ app.get("/healthz",(req, res) =>{
 });
 
 
-
-
-
-
 if (ENV.NODE_ENV === "production") {
     app.use(express.static(frontendPath));
 
