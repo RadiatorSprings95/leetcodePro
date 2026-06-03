@@ -54,7 +54,7 @@ function CreateSessionModal({
                                     Problem <span className="font-medium">{roomConfig.problem}</span>
                                 </p>
                                 <p>
-                                    Max Participants - <span className="font-medium">2 (1 on 1 sesion)</span>
+                                    Max Participants - <span className="font-medium">2 (1 on 1 session)</span>
                                 </p>
                             </div>
                         </div>

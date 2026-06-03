@@ -22,8 +22,8 @@ function DashboardPage() {
   const {data: activeSessionsData, isLoading:loadingActiveSessions} = useActiveSessions();
   const {data: recentSessionsData, isLoading:loadingRecentSessions} = useMyRecentSessions();
 
-  const isUserInSession= (session) => {
-    if(!user.id) return false;
+  const isUserInSession = (session) => {
+    if (!user?.id) return false;
 
     return session.host?.clerkId === user.id || session.participant?.clerkId === user.id;
   };
@@ -65,7 +65,7 @@ function DashboardPage() {
             />
           </div>
           
-          <RecentSessions session={recentSessions} isLoading={loadingRecentSessions} />
+          <RecentSessions sessions={recentSessions} isLoading={loadingRecentSessions} />
           
         </div>
     </div>

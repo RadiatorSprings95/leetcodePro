@@ -7,7 +7,7 @@ export const useCreateSession = () => {
         mutationKey: ["createSession"],
         mutationFn: sessionApi.createSession,
         onSuccess: () => toast.success("Room created successfully"),
-        onError: (error) => toast.error(error.response?.data?.message || "Failed to create room"),
+        onError: (error) => toast.error(error.response?.data?.msg || error.response?.data?.message || "Failed to create room"),
     });
     return result;
 };
@@ -43,7 +43,7 @@ export const useJoinSession = (id) => {
         mutationKey: ["joinSession"],
         mutationFn: () => sessionApi.joinSession(id),
         onSuccess: () => toast.success("room joined"),
-        onError: (error) => toast.error(error.response?.data?.message || "could not enter room"),
+        onError: (error) => toast.error(error.response?.data?.msg || error.response?.data?.message || "could not enter room"),
     });
 
     return result;
@@ -53,7 +53,7 @@ export const useEndSession = (id) => {
         mutationKey: ["endSession"],
         mutationFn: () => sessionApi.endSession(id),
         onSuccess: () => toast.success("room ended"),
-        onError: (error) => toast.error(error.response?.data?.message || "could not end room"),
+        onError: (error) => toast.error(error.response?.data?.msg || error.response?.data?.message || "could not end room"),
     });
 
     return result;

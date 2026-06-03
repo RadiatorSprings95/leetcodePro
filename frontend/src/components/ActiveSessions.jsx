@@ -53,7 +53,7 @@ function ActiveSessions({ sessions, isLoading, isUserInSession}) {
                         </div>
                         <div className="flex items-center gap-1.5">
                           <UsersIcon className="size-4"/>
-                          <span className="text-xs">{session.participant ? "2:2" : "1/2"}</span>
+                          <span className="text-xs">{session.participant ? "2/2" : "1/2"}</span>
                         </div>
                         {session.participant && !isUserInSession(session) ? (
                           <span className="badge badge-error badge-sm">FULL</span>
