@@ -38,20 +38,20 @@ export const useSessionById = (id) => {
     return result;
 };
 
-export const useJoinSession = (id) => {
+export const useJoinSession = () => {
     const result = useMutation({
         mutationKey: ["joinSession"],
-        mutationFn: () => sessionApi.joinSession(id),
+        mutationFn: sessionApi.joinSession,
         onSuccess: () => toast.success("room joined"),
         onError: (error) => toast.error(error.response?.data?.msg || error.response?.data?.message || "could not enter room"),
     });
 
     return result;
 };
-export const useEndSession = (id) => {
+export const useEndSession = () => {
     const result = useMutation({
         mutationKey: ["endSession"],
-        mutationFn: () => sessionApi.endSession(id),
+        mutationFn: sessionApi.endSession,
         onSuccess: () => toast.success("room ended"),
         onError: (error) => toast.error(error.response?.data?.msg || error.response?.data?.message || "could not end room"),
     });

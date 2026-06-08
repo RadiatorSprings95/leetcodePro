@@ -1,21 +1,18 @@
+import axiosInstance from "./axios";
 export async function executeCode(language, code) {
   try {
-    // Change the URL to point to your Express backend route
-    const response = await fetch("/api/code/execute", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      // Send the language and the code exactly as your codeController expects
-      body: JSON.stringify({ language, code }),
+    // Use your configured axiosInstance instead of standard fetch
+    const response = await axiosInstance.post("/api/code/execute", {
+      language,
+      code
     });
 
-    const data = await response.json();
-    
-    // This will return the { success: true, output: "..." } format you already set up
-    return data; 
-    
+    return response.data;
+
   } catch (error) {
-    return { success: false, error: error.message };
+    return { 
+        success: false, 
+        error: error.response?.data?.error || error.message 
+    };
   }
 }
