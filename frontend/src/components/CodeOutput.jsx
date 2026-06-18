@@ -3,6 +3,7 @@ function CodeOutput({ output, isRunning }) {
                           output?.output?.includes("ReferenceError") || 
                           output?.output?.includes("Exception") ||
                           output?.error; // fallback if error field exists
+
   return (
     <div className="h-full bg-base-300 font-mono text-sm p-4 md:p-6 overflow-auto flex flex-col selection:bg-base-content selection:text-base-100">
       

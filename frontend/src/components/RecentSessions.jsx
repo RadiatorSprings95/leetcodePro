@@ -41,7 +41,7 @@ function RecentSessions({ sessions, isLoading }) {
             ) : sessions?.length > 0 ? (
                 sessions.map(session => (
                     /* Brutalist Session Box */
-                    <div key={session._id} className="border-4 border-base-content p-4 bg-base-100 flex flex-col md:flex-row md:items-center justify-between shadow-[6px_6px_0px_0px_currentColor] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[2px_2px_0px_0px_currentColor] transition-all gap-4">
+                    <div key={session._id} className="border-4 border-base-content p-4 bg-base-100 flex flex-col md:flex-row md:items-center justify-between shadow-[6px_6px_0px_0px_currentColor] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[2px_2px_0px_0px_currentColor] transition-all gap-4">
 
                         {/* Left Side: Icon and Info */}
                         <div className="flex items-center gap-4 flex-1">

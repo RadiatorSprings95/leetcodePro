@@ -39,10 +39,11 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
                     </div>
 
                 ) : sessions?.length > 0 ? (
-                    sessions.map(session => (
-                        <Link key={session._id} to={`/session/${session._id}`} className="group block">
+                    sessions.map(session => {
+                        const isFull = Boolean(session.participant);
+                        const canEnter = !isFull || isUserInSession?.(session);
+                        const sessionCardContent = (
                             
-                            {/* Brutalist Session Box (Hover presses it down like a physical button) */}
                             <div className="border-4 border-base-content p-4 bg-base-100 flex flex-col md:flex-row md:items-center justify-between shadow-[6px_6px_0px_0px_currentColor] group-hover:translate-y-[2px] group-hover:translate-x-[2px] group-hover:shadow-[2px_2px_0px_0px_currentColor] transition-all gap-4">
 
                                 {/* Left Side: Avatar and Info */}
@@ -86,8 +87,17 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
                                 </div>
 
                             </div>
-                        </Link>
-                    ))
+                        );
+                        return canEnter ? (
+                            <Link key={session._id} to={`/session/${session._id}`} className="group block">
+                                {sessionCardContent}
+                            </Link>
+                        ) : (
+                            <div key={session._id} className="group block cursor-not-allowed opacity-50 grayscale"> 
+                                {sessionCardContent}
+                            </div>
+                        );
+                    })
                 ) : (
                     
                     /* Brutalist Empty State */

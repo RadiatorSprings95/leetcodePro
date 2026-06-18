@@ -157,7 +157,7 @@ function ProblemPage() {
                 </div>
 
                 {/* Brutalist Output Divider */}
-                <div className="border-t-4 border-base-content flex flex-col h-1/3 min-h-[200px]">
+                <div className="border-t-4 border-base-content flex flex-col h-1/3 min-h-50">
                   <div className="bg-base-300 border-b-4 border-base-content px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2">
                     <span className="size-2 bg-success rounded-full"></span> Standard Output
                   </div>
