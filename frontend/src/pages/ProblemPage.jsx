@@ -107,50 +107,77 @@ function ProblemPage() {
   };
 
   return (
-    <div className="h-screen bg-base-100 flex flex-col">
-      <Navbar/>
-      <div className="flex-1">
-        <PanelGroup direction="horizontal">
-          {/* left panel - problem Description*/}
-          <Panel defaultSize={40} minSize={20}>
-            <ProblemDescription
-              problem={currentProblem}  
-              currentProblemId={currentProblemId}
-              onProblemChanged={handleProblemChange}
-              allProblems={Object.values(PROBLEMS)}
-            /> 
-          </Panel>
+    <div className="h-screen bg-base-200 flex flex-col font-sans text-base-content selection:bg-primary selection:text-primary-content overflow-hidden">
+      <Navbar />
 
-          <PanelResizeHandle className="w-2 bg-base-300 hover:bg-primary transition-colors cursor-col-resize"/>
+      {/* Brutalist System Status Bar */}
+      <div className="bg-warning border-b-4 border-base-content px-6 py-2 flex items-center justify-between font-mono font-bold text-sm uppercase tracking-widest shadow-md z-10">
+        <span className="flex items-center gap-2">
+           <span className="size-3 bg-error border-2 border-base-content rounded-full animate-pulse"></span>
+           Problem // {currentProblemId}
+        </span>
+        <span>Compiler: Online</span>
+      </div>
 
-          {/* right panel - code editor & Output*/}
-          <Panel defaultSize={60} minSize={40}>
-            <PanelGroup direction="vertical">
-              {/* right Upper panel - code editor */}
-              <Panel defaultSize={70} minSize={30}>
-                <CodeEditor
-                  selectedLanguage={selectedLanguage}
-                  code={code}
-                  isRunning={isRunning}
-                  onLanguageChange={handleLanguageChange}
-                  onCodeChange={setCode}
-                  onRunCode={handleRunCode}
-                />
-              </Panel>
-              <PanelResizeHandle className="h-2 bg-base-300 hover:bg-primary transition-colors cursor-row-resize"/>
+      {/* Main Workspace */}
+      <div className="flex-1 overflow-hidden p-4 lg:p-6">
+        <div className="h-full border-4 border-base-content shadow-[12px_12px_0px_0px_currentColor] bg-base-100 overflow-hidden">
+          
+          <PanelGroup direction="horizontal">
+            
+            {/* Left Panel - Problem Description */}
+            <Panel defaultSize={40} minSize={20} className="flex flex-col bg-base-100">
+              <ProblemDescription
+                problem={currentProblem}
+                currentProblemId={currentProblemId}
+                onProblemChanged={handleProblemChange}
+                allProblems={Object.values(PROBLEMS)}
+              />
+            </Panel>
 
-              {/* right Lower panel - Output */}
-              <Panel defaultSize={30} minSize={30}>
-                <CodeOutput output={output}/>
-              </Panel>
-            </PanelGroup>
-             
-          </Panel>
-        </PanelGroup>
+            {/* Brutalist Resize Handle */}
+            <PanelResizeHandle className="w-4 bg-base-300 border-x-4 border-base-content cursor-col-resize flex items-center justify-center hover:bg-secondary transition-colors group">
+              <div className="h-12 w-1 bg-base-content/30 group-hover:bg-base-content rounded-full transition-colors" />
+            </PanelResizeHandle>
 
+            {/* Right Panel - Code Editor and Output */}
+            <Panel defaultSize={60} className="flex flex-col bg-base-100">
+              <div className="flex-1 flex flex-col overflow-hidden">
+                
+                {/* Editor Container */}
+                <div className="flex-1 overflow-hidden">
+                  <CodeEditor
+                    selectedLanguage={selectedLanguage}
+                    code={code}
+                    setCode={setCode}
+                    onLanguageChange={handleLanguageChange}
+                    onRunCode={handleRunCode}
+                    isRunning={isRunning}
+                  />
+                </div>
+
+                {/* Brutalist Output Divider */}
+                <div className="border-t-4 border-base-content flex flex-col h-1/3 min-h-50">
+                  <div className="bg-base-300 border-b-4 border-base-content px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                    <span className="size-2 bg-success rounded-full"></span> Standard Output
+                  </div>
+                  <div className="flex-1 overflow-auto bg-base-100">
+                    <CodeOutput
+                      output={output}
+                      isRunning={isRunning}
+                    />
+                  </div>
+                </div>
+
+              </div>
+            </Panel>
+
+          </PanelGroup>
+        </div>
       </div>
     </div>
-  )
+  );
+
 }
 
 export default ProblemPage

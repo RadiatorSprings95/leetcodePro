@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useNavigate, useParams } from "react-router";
 import { Loader2Icon, LogOutIcon, PhoneOffIcon } from "lucide-react";
-import { StreamCall, StreamVideo } from "@stream-io/video-react-sdk";
+import { StreamCall, StreamVideo, StreamVideoClient } from "@stream-io/video-react-sdk";
 import { isLocalAudioAttachment } from "stream-chat";
+import toast from "react-hot-toast";
 
 import { PROBLEMS } from "../data/problems";
 import { executeCode } from "../lib/jdoodle";
@@ -13,6 +14,8 @@ import CodeEditor from "../components/CodeEditor";
 import CodeOutput from "../components/CodeOutput";
 import VideoCallUI from "../components/VideoCallUI";
 import Navbar from "../components/Navbar";
+import ProblemDescription from "../components/ProblemDescription";
+
 
 import { useEndSession, useJoinSession, useSessionById } from "../hooks/useSessions";
 import useStreamClient from "../hooks/useStreamClient";
@@ -34,9 +37,22 @@ function SessionPage() {
 
     const { call, channel, chatClient, isInitializingCall, streamClient} = useStreamClient(session, loadingSession, isHost, isParticipant);
 
-    const problemData = session?.problem
-    ? Object.values(PROBLEMS).find((p) => p.title === session.problem)
-    : null;
+    // const problemData = session?.problem 
+    //     ? PROBLEMS[session.problem] 
+    //     : null;
+    const problemData = (() => {
+        if (!session?.problem) return null;
+        
+        // 1. Try the fast direct ID lookup first (e.g., "reverse-string")
+        if (PROBLEMS[session.problem]) {
+            return PROBLEMS[session.problem];
+        }
+        
+        // 2. If that fails, search the titles just in case the DB saved "Reverse String"
+        return Object.values(PROBLEMS).find(
+            (p) => p.title === session.problem || p.id === session.problem
+        ) || null;
+    })();
 
     const [ selectedLanguage, setSelectedLanguage ] = useState("javascript");
     const [ code, setCode ] = useState(problemData?.starterCode?.[selectedLanguage] || "");
@@ -88,203 +104,123 @@ function SessionPage() {
         }
     }
     
+
   return (
-    <div className="h-screen bg-base-100 flex flex-col">
+    <div className="h-screen bg-base-200 flex flex-col font-sans text-base-content selection:bg-primary selection:text-primary-content overflow-hidden">
         <Navbar/>
-        
-        <div className="flex-1">
-            <PanelGroup direction="horizontal">
-                {/* LEFT PANEL - Code Editor & Problem Desc */}
-                <Panel defaultSize={50} minSize={30}>
 
-                    <PanelGroup direction="vertical">
-                        {/* LEFT UPPER PANEL - Problem Desc */}
-                        <Panel defaultSize={50} minSize={20}>
-                            <div className="h-full overflow-y-auto bg-base-200">
-                                {/* DESC - Header Section */}
-                                <div className="p-6 bg-base-100 border-b border-base-300">
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div>
-                                            <h1 className="text-3xl font-bold text-base-content">{session?.problem || "Loading..."}</h1>
-                                            {problemData?.category && (
-                                                <p className="text-base-content/60 mt-1">{problemData.category}</p>
-                                            )}
-                                            <p className="text-base-content/60 mt-2">
-                                                Host: {session?.host?.name || "Loading..."} • {" "}
-                                                {session?.participant ? 2 : 1}/2 participants
-
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <span className={`badge badge-lg ${getDifficultyBadgeClass(session?.difficulty || "easy")}`}>
-                                                {session?.difficulty || "easy"}
-                                            </span>
-                                            {isHost && session?.status === "active" && (
-                                                <button 
-                                                    onClick={handleEndSession} 
-                                                    disabled={endSessionMutation.isPending}
-                                                    className="btn btn-error btn-sm gap-2"
-                                                >
-                                                    {endSessionMutation.isPending ? (
-                                                        <Loader2Icon className="w-4 h-4 animate-spin"/>
-                                                    ) : (
-                                                        <LogOutIcon className="w-4 h-4"/>
-                                                    )}
-                                                    End Session
-                                                </button>
-                                            )}
-                                            {session?.status === "completed" && (
-                                                <span className="badge badge-ghost badge-lg">Completed</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* Problem DESC Body */}
-                                <div className="p-6 space-y-6">
-                                    {problemData?.description && (
-                                        <div className="bg-base-100 rounded-xl shadow-sm p-5 border border-base-300">
-                                            <h2 className="text-xl font-bold mb-4 text-base-content">Description</h2>
-                                            <div className="space-y-3 text-base leading-relaxed">
-                                                <p className="text-base-content/90">{problemData.description.text}</p>
-                                                {problemData.description.notes?.map((note, idx) => (
-                                                    <p key={idx} className="text-base-content/90">
-                                                        {note}
-                                                    </p>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Examples Section */}
-                                    {problemData?.examples && problemData.examples.length > 0 && (
-                                        <div className="bg-base-100 rounded-xl shadow-sm p-5 border border-base-300">
-                                            <h2 className="text-xl font-bold mb-4 text-base-content">Examples</h2>
-
-                                            <div className="space-y-4">
-                                            {problemData.examples.map((example, idx) => (
-                                                <div key={idx}>
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <span className="badge badge-sm">{idx + 1}</span>
-                                                    <p className="font-semibold text-base-content">Example {idx + 1}</p>
-                                                </div>
-                                                <div className="bg-base-200 rounded-lg p-4 font-mono text-sm space-y-1.5">
-                                                    <div className="flex gap-2">
-                                                    <span className="text-primary font-bold min-w-17.5">
-                                                        Input:
-                                                    </span>
-                                                    <span>{example.input}</span>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                    <span className="text-secondary font-bold min-w-17.5">
-                                                        Output:
-                                                    </span>
-                                                    <span>{example.output}</span>
-                                                    </div>
-                                                    {example.explanation && (
-                                                    <div className="pt-2 border-t border-base-300 mt-2">
-                                                        <span className="text-base-content/60 font-sans text-xs">
-                                                        <span className="font-semibold">Explanation:</span>{" "}
-                                                        {example.explanation}
-                                                        </span>
-                                                    </div>
-                                                    )}
-                                                </div>
-                                                </div>
-                                            ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Constraints */}
-                                    {problemData?.constraints && problemData.constraints.length > 0 && (
-                                        <div className="bg-base-100 rounded-xl shadow-sm p-5 border border-base-300">
-                                            <h2 className="text-xl font-bold mb-4 text-base-content">Constraints</h2>
-                                            <ul className="space-y-2 text-base-content/90">
-                                                {problemData.constraints.map((constraint, idx) => (
-                                                    <li key={idx} className="flex gap-2">
-                                                        <span className="text-primary">•</span>
-                                                        <span className="text-sm">{constraint}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-
-                                </div>
-                            </div>
-                        </Panel>
-
-                        <PanelResizeHandle className="h-2 bg-base-300 hover:bg-primary transition-colors cursor-row-resize"/>
-                        
-                        {/* LEFT LOWER PANEL - Code Runner & Output */}
-                        <Panel defaultSize={50} minSize={20}>
-                            <PanelGroup direction="vertical">
-                                <Panel defaultSize={70} minSize={30}>
-                                    <CodeEditor 
-                                        selectedLanguage={selectedLanguage}
-                                        code={code}
-                                        isRunning={isRunning}
-                                        onLanguageChange={handleLanguageChange}
-                                        onCodeChange={(value) => setCode(value)}
-                                        onRunCode={handleRunCode}
-                                    />
-                                </Panel>
-        
-                                <PanelResizeHandle className="h-2 bg-base-300 hover:bg-primary transition-colors cursor-row-resize"/>
-
-                                <Panel defaultSize={30} minSize={15}>
-                                    <CodeOutput output={output}/>
-                                </Panel>
-                            </PanelGroup>
-
-                        </Panel>
-                    </PanelGroup>
-
-                    
-                </Panel>
-
-                <PanelResizeHandle className="w-2 bg-base-300 hover:bg-primary transition-colors cursor-col-resize"/>
-
-                {/* RIGHT PANEL - Video call & Chat */}
-                <Panel defaultSize={50} minSize={30}>
-                    <div className="h-full bg-base-200 p-4 overflow-auto">
-                        {isInitializingCall ? (
-                            <div className="h-full flex items-center justify-center">
-                                <div className="text-center">
-                                    <Loader2Icon className="w-12 h-12 mx-auto animate-spin text-primary mb-4"/>
-                                    <p className="text-lg">Connecting to video call...</p>
-                                </div>
-                            </div>
-                        ) : !streamClient || !call ?(
-                            <div className="h-full flex items-center justify-center">
-                                <div className="card bg-base-100 shadow-xl max-w-md">
-                                    <div className="card-body items-center text-center">
-                                        <div className="w-24 h-24 bg-error/10 rounded-full flex items-center justify-center mb-4">
-                                            <PhoneOffIcon className="w-12 h-12 text-error"/>
-                                        </div>
-                                        <h2 className="card-title text-2xl">Connection Failed</h2>
-                                        <p className="text-base-content/70">Unable to connect to the video call</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ):(
-                            <div className="h-full">
-                                <StreamVideo client={streamClient}>
-                                    <StreamCall call={call}>
-                                        <VideoCallUI chatClient={chatClient} channel={channel}/>
-                                    </StreamCall>
-                                </StreamVideo>
-                            </div>
-                        )}
-                    </div>
-                </Panel>
-
-            </PanelGroup>
-            
+        {/* Brutalist System Status Bar */}
+        <div className="bg-info text-info-content border-b-4 border-base-content px-6 py-2 flex items-center justify-between font-mono font-bold text-sm uppercase tracking-widest shadow-md z-10">
+            <span className="flex items-center gap-2">
+                <span className="size-3 bg-error border-2 border-base-content rounded-full animate-pulse"></span>
+                Live Session // Uplink Active
+            </span>
+            <span className="flex items-center gap-4">
+                <span>Terminal: Syncing...</span>
+            </span>
         </div>
 
+        {/* Main Workspace Container */}
+        <div className="flex-1 overflow-hidden p-4 lg:p-6">
+            <div className="h-full border-4 border-base-content shadow-[12px_12px_0px_0px_currentColor] bg-base-100 overflow-hidden">
+                <PanelGroup direction="horizontal">
+                    
+                    {/* Left Panel - Video Call & Chat UI */}
+                    <Panel defaultSize={35} minSize={20} className="flex flex-col border-r-4 border-base-content bg-base-200 relative">
+                        <div className="bg-secondary text-secondary-content border-b-4 border-base-content px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                            Comms_Link
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                                {/* FIX #2: Safely check for 'client', not 'videoClient' */}
+                                {streamClient && call ? (
+                                    <StreamVideo client={streamClient}>
+                                        <StreamCall call={call}>
+                                            <VideoCallUI 
+                                                chatClient={chatClient} 
+                                                channel={channel} 
+                                                isHost={isHost}
+                                                onEndSession={handleEndSession}
+                                            />
+                                        </StreamCall>
+                                    </StreamVideo>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-full bg-base-100 border-4 border-base-content p-6">
+                                        <Loader2Icon className="size-12 animate-spin text-primary mb-4" />
+                                        <span className="font-mono font-bold uppercase animate-pulse">Initializing Terminal...</span>
+                                    </div>
+                                )}
+                            </div>
+                    </Panel>
+
+                    {/* Brutalist Resize Handle */}
+                    <PanelResizeHandle className="w-4 bg-warning border-r-4 border-base-content cursor-col-resize flex items-center justify-center hover:bg-warning/80 transition-colors group">
+                        <div className="h-12 w-1 bg-base-content/30 group-hover:bg-base-content rounded-full transition-colors" />
+                    </PanelResizeHandle>
+
+                    {/* Right Panel - Code Editor & Output */}
+                    <Panel defaultSize={65} minSize={30} className="flex flex-col bg-base-100">
+                        <PanelGroup direction="vertical">
+                            <Panel defaultSize={60} minSize={10} className="overflow-auto bg-base-100">
+                                {/* Problem DESC Body */}
+                                {problemData ? (
+                                    <ProblemDescription 
+                                        problem={problemData} 
+                                    />
+                                ) : (
+                                    <div className="flex items-center justify-center h-full text-base-content/50 font-mono">
+                                        Awaiting problem data...
+                                    </div>
+                                )}
+                            </Panel>
+
+                            <PanelResizeHandle className="w-full bg-warning border-r-4 border-base-content cursor-col-resize flex items-center justify-center hover:bg-warning/80 transition-colors py-1 group">
+                                <div className="h-1 w-8 bg-base-content/30 group-hover:bg-base-content rounded-full transition-colors" />
+                            </PanelResizeHandle>
+                            <Panel defaultSize={40} minSize={30} className="flex flex-col h-full">
+                                <div className="flex-1 flex flex-col overflow-hidden">
+                                    
+                                    {/* Editor Header */}
+                                    <div className="bg-base-300 border-b-4 border-base-content px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                                        IDE_Terminal
+                                    </div>
+                                    
+                                    {/* Editor Area */}
+                                    <div className="flex-1 overflow-hidden">
+                                        <CodeEditor 
+                                            // Make sure your session props are passed down correctly here!
+                                            selectedLanguage={selectedLanguage}
+                                            code={code}
+                                            isRunning={isRunning}
+                                            onLanguageChange={handleLanguageChange}
+                                            onCodeChange={setCode}
+                                            onRunCode={handleRunCode}
+                                            />
+                                    </div>
+
+                                    {/* Brutalist Output Divider */}
+                                    <div className="border-t-4 border-base-content flex flex-col h-1/3 min-h-50p">
+                                        <div className="bg-base-300 border-b-4 border-base-content px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                                            <span className="size-2 bg-success rounded-full animate-pulse"></span> Standard Output
+                                        </div>
+                                        <div className="flex-1 overflow-auto bg-base-100">
+                                            <CodeOutput 
+                                                output={output}
+                                                isRunning={isRunning}
+                                            />
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </Panel>
+                        </PanelGroup>
+                    </Panel>
+
+                </PanelGroup>
+            </div>
+        </div>
     </div>
   )
+
 }
 
 export default SessionPage

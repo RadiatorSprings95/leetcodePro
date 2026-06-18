@@ -1,63 +1,59 @@
 import { UserButton } from "@clerk/react";
-import { BookOpenIcon, BrickWall, LayoutDashboardIcon } from "lucide-react";
-import { Link, useLocation } from "react-router"
- 
-function Navbar(){
-    const location = useLocation();
-    const isActive = (path) => path === location.pathname;
+import { BookOpenIcon, LayoutDashboardIcon, TerminalSquare } from "lucide-react";
+import { Link, useLocation } from "react-router";
 
-    return(
-        <nav className="bg-base-100/80 backdrop:blur-md border-b border-primary/20 sticky 
-            top-0 z-50 shadow-lg">
-            <div className="max-w-7xl mx-auto p-4 flex items-center justify-between">
-                {/* LOGO */}
-                <Link to="/"
-                    className="flex items-center gap-3 hover:scale-105 transition-transform duration-200">
-                    <div className="size-10 rounded-xl flex items-center bg-info
-                        justify-center shadow-lg">
-                        <BrickWall  className="size-6 text-white"/>
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="font-black text-xl font-mono tracking-wider text-accent">Leetcode Pro</span>
-                        <span className="text-xs text-base-content/60 font-medium  -mt-1">better leetcode</span>
-                    </div>
-                </Link>
-                
-                <div className="flex items-center gap-1">
-                    {/* Problems Page Link*/}
-                    <Link to={"/problems"}
-                        className={`px-4 py-2.5 rounded-lg transition-all duration-200
-                            ${isActive("/problems") ? "bg-primary text-primary-content" : `hover:bg-base-200 
-                                text-base-content/70 hover:text-base-content`}                            
-                            `}
-                    >
-                        <div className="flex items-center gap-x-2.5">
-                            <BookOpenIcon className="size-4"/>
-                            <span className="font medium hidden sm:inline">Problems</span>
-                        </div> 
+function Navbar() {
+  const location = useLocation();
+  const isActive = (path) => path === location.pathname;
 
-                    </Link>
+  return (
+    <nav className="bg-base-100 border-b-4 border-base-content px-6 py-3 sticky top-0 z-50 flex items-center justify-between">
+      {/* Retro Brand Area */}
+      <div>
+        <Link to="/" className="flex items-center gap-2 group">
+          {/* Physical button effect on logo */}
+          <div className="bg-primary border-2 border-base-content p-1.5 shadow-[2px_2px_0px_0px_currentColor] group-hover:translate-y-[2px] group-hover:shadow-none transition-all">
+            <TerminalSquare className="size-6 text-primary-content" />
+          </div>
+          <div className="flex flex-col ml-2">
+            <span className="font-black text-2xl tracking-tighter uppercase">
+              LeetCode<span className="text-primary">Pro</span>
+            </span>
+          </div>
+        </Link>
+      </div>
 
-                    {/* Dashboard Page Link*/}
-                    <Link to={"/dashboard"}
-                        className={`px-4 py-2.5 rounded-lg transition-all duration-200
-                            ${isActive("/dashboard") ? "bg-primary text-primary-content" : `hover:bg-base-200 
-                                text-base-content/70 hover:text-base-content`}                            
-                            `}
-                    >
-                        <div className="flex items-center gap-x-2.5">
-                            <LayoutDashboardIcon className="size-4"/>
-                            <span className="font medium hidden sm:inline">Dashboard</span>
-                        </div> 
-                    </Link>
-                    <div className="ml-4 mt-2">
-                        <UserButton/>
-                    </div>
-
-                </div>
-            </div>
-            
-        </nav>
-    );
+      {/* Navigation Links & Profile */}
+      <div className="flex items-center gap-6">
+        <ul className="flex gap-4 font-bold uppercase tracking-wide text-sm">
+          <li>
+            <Link 
+              to="/dashboard" 
+              className={`flex items-center gap-2 px-3 py-2 border-2 border-transparent hover:border-base-content hover:shadow-[2px_2px_0px_0px_currentColor] transition-all
+              ${isActive('/dashboard') ? 'bg-secondary text-secondary-content border-base-content shadow-[2px_2px_0px_0px_currentColor]' : ''}`}
+            >
+              <LayoutDashboardIcon className="size-4" />
+              <span className="hidden sm:block">Dashboard</span>
+            </Link>
+          </li>
+          <li>
+            <Link 
+              to="/problems" 
+              className={`flex items-center gap-2 px-3 py-2 border-2 border-transparent hover:border-base-content hover:shadow-[2px_2px_0px_0px_currentColor] transition-all
+              ${isActive('/problems') ? 'bg-secondary text-secondary-content border-base-content shadow-[2px_2px_0px_0px_currentColor]' : ''}`}
+            >
+              <BookOpenIcon className="size-4" />
+              <span className="hidden sm:block">Problems</span>
+            </Link>
+          </li>
+        </ul>
+        {/* Clerk User Profile */}
+        <div className="pl-6 border-l-4 border-base-content flex items-center">
+          <UserButton afterSignOutUrl="/" />
+        </div>
+      </div>
+    </nav>
+  );
 }
+
 export default Navbar;
