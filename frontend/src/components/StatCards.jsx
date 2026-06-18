@@ -2,33 +2,36 @@ import { TrophyIcon, UsersIcon } from "lucide-react";
 
 function StatsCards({ activeSessionsCount, recentSessionsCount }) {
   return (
-    <div className="lg:col-span-1 grid grid-cols-1 gap-6">
-      {/* Active Count */}
-      <div className="card bg-base-100 border-2 border-primary/20 hover:border-primary/40">
-        <div className="card-body">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-primary/10 rounded-2xl">
-              <UsersIcon className="w-7 h-7 text-primary" />
-            </div>
-            <div className="badge badge-primary">Live</div>
+    <div className="lg:col-span-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-8">
+      
+      {/* Brutalist Active Count */}
+      <div className="bg-success/20 border-4 border-base-content p-6 shadow-[8px_8px_0px_0px_currentColor] hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_currentColor] transition-all">
+        <div className="flex items-center justify-between mb-4 border-b-4 border-base-content/20 pb-4">
+          <div className="p-3 bg-base-100 border-2 border-base-content shadow-[2px_2px_0px_0px_currentColor]">
+            <UsersIcon className="size-8 text-success" />
           </div>
-          <div className="text-4xl font-black mb-1">{activeSessionsCount}</div>
-          <div className="text-sm opacity-60">Active Sessions</div>
+          <div className="font-mono font-black uppercase tracking-widest text-xs bg-success text-success-content px-3 py-1 border-2 border-base-content shadow-[2px_2px_0px_0px_currentColor]">
+            Live_Nodes
+          </div>
         </div>
+        <div className="text-6xl font-black font-mono tracking-tighter mb-2">{activeSessionsCount || 0}</div>
+        <div className="font-bold uppercase tracking-widest text-sm text-base-content/70">Active Sessions</div>
       </div>
 
-      {/* Recent Count */}
-      <div className="card bg-base-100 border-2 border-secondary/20 hover:border-secondary/40">
-        <div className="card-body">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-amber-300 rounded-2xl">
-              <TrophyIcon className="w-7 h-7 text-amber-900" />
-            </div>
+      {/* Brutalist Recent Count */}
+      <div className="bg-primary/20 border-4 border-base-content p-6 shadow-[8px_8px_0px_0px_currentColor] hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_currentColor] transition-all">
+        <div className="flex items-center justify-between mb-4 border-b-4 border-base-content/20 pb-4">
+          <div className="p-3 bg-base-100 border-2 border-base-content shadow-[2px_2px_0px_0px_currentColor]">
+            <TrophyIcon className="size-8 text-primary" />
           </div>
-          <div className="text-4xl font-black mb-1">{recentSessionsCount}</div>
-          <div className="text-sm opacity-60">Total Sessions</div>
+          <div className="font-mono font-black uppercase tracking-widest text-xs bg-base-200 px-3 py-1 border-2 border-base-content shadow-[2px_2px_0px_0px_currentColor]">
+            Resolved
+          </div>
         </div>
+        <div className="text-6xl font-black font-mono tracking-tighter mb-2">{recentSessionsCount || 0}</div>
+        <div className="font-bold uppercase tracking-widest text-sm text-base-content/70">Completed Sessions</div>
       </div>
+
     </div>
   );
 }
