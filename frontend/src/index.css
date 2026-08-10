@@ -1,6 +1,7 @@
 @import "tailwindcss";
+
 @plugin "daisyui" {
-    themes: retro;
+    themes: retro, night;
 };
 
 /* add cursor to the pointer by default */
@@ -9,4 +10,25 @@
     [role="button"]:not(:disabled) {
         cursor: pointer;
     }
+}
+
+/* ── Custom dark-theme tweaks for "night" ──────────────────────────
+   night's warning is a proper amber, but warning-content defaults to
+   dark-on-amber which reads fine. We nudge a few values so the
+   neo-brutalist look still pops in dark mode.                        */
+[data-theme="night"] {
+    /* Make warning a punchy amber with dark text — solves the lime issue */
+    --color-warning:         oklch(78% 0.20 75);   /* warm amber */
+    --color-warning-content: oklch(15% 0.04 75);   /* near-black */
+
+    /* Slightly brighter primary so the "LeetCodePro" tint stays vivid */
+    --color-primary:         oklch(62% 0.22 255);  /* electric blue */
+    --color-primary-content: oklch(98% 0.01 255);  /* white */
+
+    /* Accent stays punchy */
+    --color-accent:          oklch(70% 0.20 340);  /* hot pink / magenta */
+    --color-accent-content:  oklch(98% 0.01 340);
+
+    /* Borders show up clearly against the dark base */
+    --color-base-content:    oklch(90% 0.01 240);
 }
